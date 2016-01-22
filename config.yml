@@ -1,0 +1,13 @@
+kind: smusher
+name: Smusher
+description: Automatically optimize your image files
+active: false
+author:
+  name: Tom Moor
+  email: tom.moor@gmail.com
+files:
+  - !ruby/regexp '/.+\.jpe?g\z/i'
+triggers:
+  - pull_request_opened
+actions:
+  - pull_request

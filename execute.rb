@@ -15,6 +15,7 @@ changed_files.each do |file|
 
     # check how much was saved, if its negligable then that's probably not a change worth making as it will only reduce quality with little benefit.
     if percentage_change < 1
+      puts "#{file} optimization not enough to report"
       system "git checkout #{file}" 
     else
       # record discovery
@@ -25,20 +26,48 @@ changed_files.each do |file|
   end
 end
 
-message = "Optimized image assets"
 branch = "pushbit/smusher"
 if changed_files.length > 0
   branch += "-#{ENV.fetch('GITHUB_NUMBER')}"
 end
 
-puts "Checking out branch"
-system "git checkout -B #{branch}"
+if reportable_files.length > 0
+  puts "Checking out branch"
+  system "git checkout -B #{branch}"
 
-puts "Adding updated files"
-system "git add #{reportable_files.join(" ")}"
+  puts "Adding updated files"
+  system "git add #{reportable_files.join(" ")}"
 
-puts "Commiting changed files"
-system "git commit -m \"#{message}\""
+  puts "Commiting changed files"
+  system "git commit -m \"Optimized image assets\""
 
-puts "Pushing branch"
-system "git push -f origin #{branch}"
+  puts "Pushing branch"
+  system "git push -f origin #{branch}"
+  
+  conn = Faraday.new(:url => ENV.fetch("APP_URL")) do |config|
+    config.adapter Faraday.default_adapter
+  end
+  
+  reportable_files.each do |file|
+    discovery = {
+      title: "#{file} optimized",
+      task_id: ENV.fetch("TASK_ID"),
+      kind: :optimization,
+      identifier: ["smusher", file, ENV.fetch("BASE_BRANCH")].join("-"),
+      branch: branch,
+      code_changed: true,
+      priority: :low,
+      message: discovery_message
+    }
+
+    puts "Posting discovery"
+    res = conn.post do |req|
+      req.url '/discoveries'
+      req.headers['Content-Type'] = 'application/json'
+      req.headers['Authorization'] = "Basic #{ENV.fetch("ACCESS_TOKEN")}"
+      req.body = discovery.to_json
+    end
+  end
+else
+  puts "No images were optimized"
+end

@@ -4,7 +4,7 @@ MAINTAINER Tom Moor "tom.moor@gmail.com"
 
 RUN apt-get update
 
-# mozjpeg installation
+# mozjpeg
 RUN apt-get install -y autoconf automake libtool nasm make
 RUN mkdir mozjpeg
 RUN wget -O - https://github.com/mozilla/mozjpeg/archive/v1.0.1.tar.gz | tar xzf - --strip-components=1 -C "/mozjpeg"
@@ -17,6 +17,9 @@ RUN sh ../configure
 RUN make install
 RUN ln -s /opt/libmozjpeg/bin/jpegtran /usr/local/bin/mozjpeg
 WORKDIR /
+
+# pngquant
+RUN apt-get install -y pngquant
 
 RUN gem install faraday
 

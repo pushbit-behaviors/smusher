@@ -6,29 +6,35 @@ changed_files = ENV.fetch("CHANGED_FILES").split(' ')
 reportable_files = []
 
 changed_files.each do |file|
-  if file.match(/.+\.jpe?g\z/i)
-    puts "Compressing #{file}"
-    size_before = File.stat(file).size
+  percentage_change = 0
+  puts "#{file}"
+  size_before = File.stat(file).size
+  
+  if file.match(/.+\.png\z/i)
+    system "pngquant --force --ext=.png #{file}"
+    size_after = File.stat(file).size
+    size_diff = size_before-size_after
+    percentage_change = (1-(size_after.to_f/size_before))*100
+    
+  elsif file.match(/.+\.jpe?g\z/i)
     system "mozjpeg -copy none -optimize -outfile #{file} #{file}"
     size_after = File.stat(file).size
     size_diff = size_before-size_after
     percentage_change = (1-(size_after.to_f/size_before))*100
-
-    # check how much was saved, if its negligable then that's probably not a change worth making as it will only reduce quality with little benefit.
-    if percentage_change < 1
-      puts "#{file} optimization not enough to report"
-      system "git checkout #{file}" 
-    else
-      # record discovery
-      reportable_files << {
-        file: file,
-        file_name: file.split('/').last,
-        size_diff: size_diff,
-        percentage_change: percentage_change.round(2)
-      }
-    end
+  end
+  
+  # check how much was saved, if its negligable then that's probably not a change worth making as it will only reduce quality with little benefit.
+  if percentage_change < 1
+    puts "#{file} optimization not enough to report"
+    system "git checkout #{file}" 
   else
-    puts "Skipping #{file}"
+    # record discovery
+    reportable_files << {
+      file: file,
+      file_name: file.split('/').last,
+      size_diff: size_diff,
+      percentage_change: percentage_change.round(2)
+    }
   end
 end
 

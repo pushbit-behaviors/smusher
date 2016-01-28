@@ -12,6 +12,7 @@ repository:
   url: https://github.com/pushbit-behaviors/smusher
 files:
   - !ruby/regexp '/.+\.jpe?g\z/i'
+  - !ruby/regexp '/.+\.png\z/i'
 triggers:
   - pull_request_opened
 actions:

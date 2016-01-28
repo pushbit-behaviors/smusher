@@ -1,6 +1,6 @@
 kind: smusher
 name: Smusher
-description: Automatically optimize your image files
+description: Automatically compresses your jpeg and png image assets to save bandwidth and speed up your project
 discovers: unoptimized image
 active: true
 checkout: patch

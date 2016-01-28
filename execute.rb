@@ -1,5 +1,6 @@
 $stdout.sync = true
 require "faraday"
+require "json"
 
 changed_files = ENV.fetch("CHANGED_FILES").split(' ')
 reportable_files = []
@@ -19,7 +20,12 @@ changed_files.each do |file|
       system "git checkout #{file}" 
     else
       # record discovery
-      reportable_files << file
+      reportable_files << {
+        file: file,
+        file_name: file.split('/').last,
+        size_diff: size_diff,
+        percentage_change: percentage_change.round(2)
+      }
     end
   else
     puts "Skipping #{file}"
@@ -36,10 +42,10 @@ if reportable_files.length > 0
   system "git checkout -B #{branch}"
 
   puts "Adding updated files"
-  system "git add #{reportable_files.join(" ")}"
+  system "git add #{reportable_files.map{|f| f[:file] }.join(" ")}"
 
   puts "Commiting changed files"
-  system "git commit -m \"Optimized image assets\""
+  system "git commit -m \"Compressed image files\""
 
   puts "Pushing branch"
   system "git push -f origin #{branch}"
@@ -50,14 +56,13 @@ if reportable_files.length > 0
   
   reportable_files.each do |file|
     discovery = {
-      title: "#{file} optimized",
+      title: "#{file[:file_name]} compressed (#{file[:percentage_change]}% smaller)",
       task_id: ENV.fetch("TASK_ID"),
       kind: :optimization,
-      identifier: ["smusher", file, ENV.fetch("BASE_BRANCH")].join("-"),
+      identifier: "smusher-#{file}",
       branch: branch,
       code_changed: true,
-      priority: :low,
-      message: discovery_message
+      priority: :low
     }
 
     puts "Posting discovery"
@@ -69,5 +74,5 @@ if reportable_files.length > 0
     end
   end
 else
-  puts "No images were optimized"
+  puts "No images were compressed"
 end

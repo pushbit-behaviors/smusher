@@ -1,13 +1,24 @@
 kind: smusher
 name: Smusher
 description: Automatically optimize your image files
+discovers: unoptimized image
 active: false
+checkout: patch
 author:
   name: Tom Moor
   email: tom.moor@gmail.com
+repository:
+  type: git
+  url: https://github.com/pushbit-behaviors/smusher
 files:
   - !ruby/regexp '/.+\.jpe?g\z/i'
 triggers:
   - pull_request_opened
 actions:
   - pull_request
+keywords:
+  - image
+  - jpeg
+  - photo
+  - compression
+  - optimization

@@ -21,4 +21,6 @@ WORKDIR /
 RUN gem install faraday
 
 ADD ./execute.rb ./execute.rb
-CMD ruby ./execute.rb
+ADD ./execute.sh ./execute.sh
+
+CMD /bin/bash -c -l "./execute.sh"

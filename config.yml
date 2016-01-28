@@ -2,7 +2,7 @@ kind: smusher
 name: Smusher
 description: Automatically optimize your image files
 discovers: unoptimized image
-active: false
+active: true
 checkout: patch
 author:
   name: Tom Moor

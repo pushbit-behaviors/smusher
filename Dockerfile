@@ -1,4 +1,4 @@
-FROM ruby:latest
+FROM pushbit/ruby
 
 MAINTAINER Tom Moor "tom.moor@gmail.com"
 
@@ -24,6 +24,5 @@ RUN apt-get install -y pngquant
 RUN gem install faraday
 
 ADD ./execute.rb ./execute.rb
-ADD ./execute.sh ./execute.sh
 
-CMD /bin/bash -c -l "./execute.sh"
+CMD ["./execute.rb"]

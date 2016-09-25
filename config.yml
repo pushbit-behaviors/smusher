@@ -15,6 +15,7 @@ files:
   - !ruby/regexp '/.+\.png\z/i'
 triggers:
   - pull_request_opened
+  - push
 actions:
   - pull_request
 keywords:
